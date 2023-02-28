@@ -23,7 +23,7 @@
                     "type": "string"
                 },
                 "date": {
-                    "description": "The date the project was created, in RFC3339 (extension to ISO 8601) format.",
+                    "description": "The date the project was created, in RFC 3339 format (similar to ISO 8601).",
                     "type": "string",
                     "format": "date-time"
                 },
@@ -35,10 +35,13 @@
                     "description": "The description of the project.",
                     "type": "string"
                 }
+            },
+            "patternProperties": {
+                "\\/+": false
             }
         },
         "objects": {
-            "description": "The project's objects array.",
+            "description": "An array containing all of the objects contained within the project.",
             "type": "array",
             "items": {
                 "type": "object",
@@ -46,14 +49,17 @@
                     "id": {
                         "description": "The UUID (aka GUID) of the object, enclosed in curly brackets to make clear that it is supposed to be parsed as a UUID and NOT as a number. Used to reference the object throughout the project. Can be omitted if referencing the object is not required.",
                         "type": "string",
-                        "pattern": "^\\{[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}\\}$"
+                        "pattern": "^\\{[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}\\}$",
+                        "not": {
+                            "pattern": "{00000000-0000-0000-0000-000000000000}"
+                        }
                     },
                     "name": {
                         "description": "The name of the object, for editor display purposes.",
                         "type": "string"
                     },
                     "parentId": {
-                        "description": "The UUID of the parent object, enclosed in curly brackets to make clear that it is supposed to be parsed as a UUID and NOT as a number. If included, this object is a child of the given parent object, and all transform data (position, rotation, and/or scale) is relative to the parent's transform data (which is relative to its parent's transform data, and so on).",
+                        "description": "The UUID of the parent object, enclosed in curly brackets to make clear that it is supposed to be parsed as a UUID and NOT as a number. If included, this object is a child of the given parent object, and the object's transform is relative to the parent's transform (which is relative to its parent's transform, and so on).",
                         "type": "string",
                         "pattern": "^\\{[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}\\}$"
                     },
@@ -64,10 +70,11 @@
                     },
                     "type": {
                         "description": "The type of the object. Required, unless this object is an instance of another object, in which case, it is optional, as it can just be taken from the instanced object.",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 1
                     },
                     "position": {
-                        "description": "The position of the object within 3D space. Specified as a 3-dimensional array, representing a vector3 using X-right, Y-up, and Z-forward coordinates, and meters as its units. This position is local to the position of the parent object (which is local to the position of its parent object, and so on) if a parent object is specified. Otherwise, this position is global. If not included, the value [ 0.0, 0.0, 0.0 ] will be used as a fallback.",
+                        "description": "The position of the object within 3D space. Specified as a 3-dimensional array, representing a vector3 using left-handed coordinates (X-right, Y-up, and Z-forward), and meters as its units. This position is local to the transform of the parent object (which is local to the transform of its parent object, and so on) if a parent object is specified. Otherwise, this position is global. If not included, the value [ 0.0, 0.0, 0.0 ] will be used as a fallback.",
                         "type": "array",
                         "items": {
                             "type": "number"
@@ -77,7 +84,7 @@
                         "default": [ 0.0, 0.0, 0.0 ]
                     },
                     "rotation": {
-                        "description": "The rotation of the object within 3D space. Specified as a 4-dimensional array, representing a quaternion. This rotation is local to the rotation of the parent object (which is local to the rotation of its parent object, and so on) if a parent object is specified. Otherwise, this rotation is global. If not included, the value [ 0.0, 0.0, 0.0, 1.0 ] will be used as a fallback.",
+                        "description": "The rotation of the object within 3D space. Specified as a 4-dimensional array, representing a quaternion using left-handed coordinates. This rotation is local to the transform of the parent object (which is local to the transform of its parent object, and so on) if a parent object is specified. Otherwise, this rotation is global. If not included, the value [ 0.0, 0.0, 0.0, 1.0 ] will be used as a fallback.",
                         "type": "array",
                         "items": {
                             "type": "number"
@@ -87,7 +94,7 @@
                         "default": [ 0.0, 0.0, 0.0, 1.0 ]
                     },
                     "scale": {
-                        "description": "The scaling of the object within 3D space. Specified as a 3-dimensional array, representing a vector3 using X-right, Y-up, and Z-forward coordinates, and meters as its units. This scale is local to the scale of the parent object (which is local to the scale of its parent object, and so on) if a parent object is specified. Otherwise, this scale is global. If not included, the value [ 1.0, 1.0, 1.0 ] will be used as a fallback.",
+                        "description": "The scaling of the object within 3D space. Specified as a 3-dimensional array, representing a vector3 using left-handed coordinates (X-right, Y-up, and Z-forward), and meters as its units. This scale is local to the transform of the parent object (which is local to the transform of its parent object, and so on) if a parent object is specified. Otherwise, this scale is global. If not included, the value [ 1.0, 1.0, 1.0 ] will be used as a fallback.",
                         "type": "array",
                         "items": {
                             "type": "number"
@@ -101,21 +108,30 @@
                         "type": "boolean",
                         "default": true
                     },
-                    "excluded": {
+                    "isExcluded": {
                         "description": "Whether the object should be excluded from the scene. If specified as true, editors should (as applicable) hide the object from 3D display, but still show it in the object hierarchy as a disabled object, and provide a mechanism for users to un-exclude it. When converting, tooling should treat excluded objects as if they do not exist, and should simply not write the excluded objects to the resulting file when converting from HSON. If not specified, defaults to false.",
                         "type": "boolean",
                         "default": false
                     },
                     "parameters": {
-                        "description": "Named parameters for the object. Any number of JSON objects of any type are allowed here, all of which are always optional. Editor/Game-specific parameters that you want to be editable by all HSON tooling, such as \"range_in\"/\"range_out\", can also go here. Tooling should not rely on any parameters being present. When converting, tooling should, instead, lookup each parameter by its name as needed, and either error-out or fallback to a default value if a required parameter is not present.",
-                        "type": "object"
+                        "description": "Named parameters for the object. Any number of JSON objects of any type are allowed here, all of which are always optional. Editor/Game-specific parameters that you want to be editable by all HSON tooling can also go here. Tooling should not rely on any parameters being present. When converting, tooling should, instead, lookup each parameter by its name as needed, and either error-out or fallback to a default value if a required parameter is not present.",
+                        "type": "object",
+                        "patternProperties": {
+                            "\\/+": false
+                        }
                     }
+                },
+                "patternProperties": {
+                    "\\/+": false
                 },
                 "anyOf": [
                     { "required": [ "type" ] },
                     { "required": [ "instanceOf" ]}
                 ]
             }
+        },
+        "patternProperties": {
+            "\\/+": false
         }
     },
     "required": [ "version" ]
