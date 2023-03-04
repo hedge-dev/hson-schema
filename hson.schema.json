@@ -74,7 +74,7 @@
                         "minLength": 1
                     },
                     "position": {
-                        "description": "The position of the object within 3D space. Specified as a 3-dimensional array, representing a vector3 using left-handed coordinates (X-right, Y-up, and Z-forward), and meters as its units. This position is local to the transform of the parent object (which is local to the transform of its parent object, and so on) if a parent object is specified. Otherwise, this position is global. If not included, the value [ 0.0, 0.0, 0.0 ] will be used as a fallback.",
+                        "description": "The position of the object within 3D space. Specified as a 3-dimensional array, representing a vector3 using right-handed coordinates (X-right, Y-up, and Z-backwards), and meters as its units. This position is local to the transform of the parent object (which is local to the transform of its parent object, and so on) if a parent object is specified. Otherwise, this position is global. If not included, the value [ 0.0, 0.0, 0.0 ] will be used as a fallback.",
                         "type": "array",
                         "items": {
                             "type": "number"
@@ -84,7 +84,7 @@
                         "default": [ 0.0, 0.0, 0.0 ]
                     },
                     "rotation": {
-                        "description": "The rotation of the object within 3D space. Specified as a 4-dimensional array, representing a quaternion using left-handed coordinates. This rotation is local to the transform of the parent object (which is local to the transform of its parent object, and so on) if a parent object is specified. Otherwise, this rotation is global. If not included, the value [ 0.0, 0.0, 0.0, 1.0 ] will be used as a fallback.",
+                        "description": "The rotation of the object within 3D space. Specified as a 4-dimensional array, representing a quaternion using Y-up right-handed coordinates. This rotation is local to the transform of the parent object (which is local to the transform of its parent object, and so on) if a parent object is specified. Otherwise, this rotation is global. If not included, the value [ 0.0, 0.0, 0.0, 1.0 ] will be used as a fallback.",
                         "type": "array",
                         "items": {
                             "type": "number"
@@ -94,7 +94,7 @@
                         "default": [ 0.0, 0.0, 0.0, 1.0 ]
                     },
                     "scale": {
-                        "description": "The scaling of the object within 3D space. Specified as a 3-dimensional array, representing a vector3 using left-handed coordinates (X-right, Y-up, and Z-forward), and meters as its units. This scale is local to the transform of the parent object (which is local to the transform of its parent object, and so on) if a parent object is specified. Otherwise, this scale is global. If not included, the value [ 1.0, 1.0, 1.0 ] will be used as a fallback.",
+                        "description": "The scaling of the object within 3D space. Specified as a 3-dimensional array, representing a vector3 using Y-up right-handed coordinates (X-right, Y-up, and Z-backwards), and meters as its units. This scale is local to the transform of the parent object (which is local to the transform of its parent object, and so on) if a parent object is specified. Otherwise, this scale is global. If not included, the value [ 1.0, 1.0, 1.0 ] will be used as a fallback.",
                         "type": "array",
                         "items": {
                             "type": "number"
